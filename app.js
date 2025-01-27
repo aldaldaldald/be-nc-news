@@ -2,10 +2,16 @@ const express = require("express");
 const app = express();
 const endpointsJson = require("./endpoints.JSON");
 
-app.use(express.json());
+const { getTopics } = require("./controllers/topics.controllers");
 
-app.get("/api", (request, response) => {
-  response.status(200).send({ endpoints: endpointsJson });
+app.get("/api", (req, res) => {
+  res.status(200).send({ endpoints: endpointsJson });
+});
+
+app.get("/api/topics", getTopics);
+
+app.all("*", (req, res) => {
+  res.status(404).send({ error: "Endpoint not found" });
 });
 
 module.exports = app;
