@@ -1,6 +1,9 @@
 const endpointsJson = require("../endpoints.json");
 /* Set up your test imports here */
 
+const request = require("supertest");
+const app = require("../app.js");
+
 /* Set up your beforeEach & afterAll functions here */
 
 describe("GET /api", () => {
