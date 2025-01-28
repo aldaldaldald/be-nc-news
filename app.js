@@ -3,14 +3,20 @@ const app = express();
 const endpointsJson = require("./endpoints.JSON");
 
 const { getTopics } = require("./controllers/topics.controllers.js");
+const {
+  getArticles,
+  getArticleById,
+} = require("./controllers/articles.controllers.js");
 
-const { getArticleById } = require("./controllers/articles.controllers.js");
+// middleware
 
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints: endpointsJson });
 });
 
 app.get("/api/topics", getTopics);
+
+app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
