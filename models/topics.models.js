@@ -1,8 +1,7 @@
 const db = require("../db/connection");
 
 const fetchTopics = () => {
-  let SQLString = `SELECT * FROM topics`;
-  return db.query(SQLString).then(({ rows }) => {
+  return db.query(`SELECT * FROM topics`).then(({ rows }) => {
     return rows;
   });
 };
