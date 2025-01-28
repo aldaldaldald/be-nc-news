@@ -28,4 +28,26 @@ const fetchArticleById = (article_id) => {
     });
 };
 
-module.exports = { fetchArticles, fetchArticleById };
+const fetchCommentsByArticleId = (article_id) => {
+  return db
+    .query(
+      `SELECT comment_id, comments.votes, comments.created_at, comments.author, comments.body, comments.article_id 
+       FROM articles
+       LEFT JOIN comments
+       ON articles.article_id = comments.article_id
+       WHERE articles.article_id=$1
+       ORDER BY created_at DESC`,
+      [article_id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ message: "Article not found" });
+      } else if (rows[0].comment_id === null) {
+        return Promise.reject({ message: "No comments found" });
+      } else {
+        return rows;
+      }
+    });
+};
+
+module.exports = { fetchArticles, fetchArticleById, fetchCommentsByArticleId };
