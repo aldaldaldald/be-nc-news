@@ -161,3 +161,85 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Responds by adding a comment with a username and body to an article", () => {
+    const newComment = {
+      username: "icellusedkars",
+      body: "This is my comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            votes: 0,
+            body: "This is my comment",
+            article_id: 1,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  test("400: Responds error message 'Body is missing' if no body", () => {
+    const newComment = {
+      username: "icellusedkars",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Body is missing");
+      });
+  });
+  test("400: Responds error message 'Username is missing' if no username", () => {
+    const newComment = {
+      body: "This is my comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Username is missing");
+      });
+  });
+  test("400: Responds error message 'Body is empty' if no body content", () => {
+    const newComment = {
+      username: "icellusedkars",
+      body: "",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Body is empty");
+      });
+  });
+  test("400: Responds with an error when the username does not exist", () => {
+    const newComment = {
+      username: "userdoesnotexistuserdoesnotexistuserdoesnotexist",
+      body: "This is my comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("User does not exist");
+      });
+  });
+  test("404: Article not found", () => {
+    return request(app)
+      .get("/api/articles/9000/comments")
+      .expect(404)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Not found");
+      });
+  });
+});

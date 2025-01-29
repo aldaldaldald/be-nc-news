@@ -7,9 +7,12 @@ const {
   getArticles,
   getArticleById,
   getCommentsByArticleId,
+  postCommentByArticleId,
 } = require("./controllers/articles.controllers.js");
 
 // middleware
+
+app.use(express.json());
 
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints: endpointsJson });
@@ -23,12 +26,14 @@ app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
+app.post("/api/articles/:article_id/comments", postCommentByArticleId);
+
 app.all("*", (req, res) => {
   res.status(404).send({ err: "Endpoint not found" });
 });
 
 // error-handling middleware
-
+// 400's
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ err: "Bad Request" });
@@ -36,7 +41,46 @@ app.use((err, req, res, next) => {
     next(err);
   }
 });
+app.use((err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(400).send({ err: "User does not exist" });
+  } else {
+    next(err);
+  }
+});
 
+app.use((err, req, res, next) => {
+  if (err.message === "Body is missing") {
+    res.status(400).send({ err: "Body is missing" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.message === "Username is missing") {
+    res.status(400).send({ err: "Username is missing" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.message === "Body is empty") {
+    res.status(400).send({ err: "Body is empty" });
+  } else {
+    next(err);
+  }
+});
+
+// 404's
+app.use((err, req, res, next) => {
+  if (err.message === "No comments found") {
+    res.status(404).send({ err: "No comments found" });
+  } else {
+    next(err);
+  }
+});
 app.use((err, req, res, next) => {
   if (err.message === "Article not found") {
     res.status(404).send({ err: "Not found" });
@@ -45,14 +89,7 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.use((err, req, res, next) => {
-  if (err.message === "No comments found") {
-    res.status(404).send({ err: "No comments found" });
-  } else {
-    next(err);
-  }
-});
-
+// 500
 app.use((err, req, res, next) => {
   console.log(err, "<<< You have not handled this error yet");
   res.status(500).send({ err: "Internal Server Error" });

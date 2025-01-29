@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { convertTimestampToDate } = require("../db/seeds/utils");
 
 const fetchArticles = () => {
   return db
@@ -50,4 +51,35 @@ const fetchCommentsByArticleId = (article_id) => {
     });
 };
 
-module.exports = { fetchArticles, fetchArticleById, fetchCommentsByArticleId };
+const addCommentByArticleId = (newComment, articleId) => {
+  const { username, body } = newComment;
+  const { article_id } = articleId;
+  const votes = 0;
+  const { created_at } = convertTimestampToDate({ created_at: new Date() });
+  if (body === "") {
+    return Promise.reject({ message: "Body is empty" });
+  }
+  if (!body) {
+    return Promise.reject({ message: "Body is missing" });
+  }
+  if (!username) {
+    return Promise.reject({ message: "Username is missing" });
+  }
+  return db
+    .query(
+      `INSERT INTO comments (body, votes, author, article_id, created_at) 
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [body, votes, username, article_id, created_at]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+module.exports = {
+  fetchArticles,
+  fetchArticleById,
+  fetchCommentsByArticleId,
+  addCommentByArticleId,
+};
