@@ -30,8 +30,8 @@ describe("404", () => {
     return request(app)
       .get("/api/notfound")
       .expect(404)
-      .then((response) => {
-        expect(response.body.err).toBe("Endpoint not found");
+      .then((res) => {
+        expect(res.body.err).toBe("Endpoint not found");
       });
   });
 });
@@ -318,6 +318,33 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body: { err } }) => {
         expect(err).toBe("Not found");
+      });
+  });
+});
+
+describegit("DELETE /api/comments/:comment_id", () => {
+  test("204: Deletes a comment object by comment ID ", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+  test("400: Comment ID not a number", () => {
+    return request(app)
+      .delete("/api/comments/text")
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Bad Request");
+      });
+  });
+  test("404: Comment ID not found", () => {
+    return request(app)
+      .delete("/api/comments/9000/")
+      .expect(404)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Comment ID not found");
       });
   });
 });
