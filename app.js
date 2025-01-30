@@ -10,6 +10,9 @@ const {
   postCommentByArticleId,
   patchVotesByArticleId,
 } = require("./controllers/articles.controllers.js");
+const {
+  deleteCommentByCommentId,
+} = require("./controllers/comments.controllers.js");
 
 // middleware
 
@@ -30,6 +33,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 app.patch("/api/articles/:article_id", patchVotesByArticleId);
+
+app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
 
 app.all("*", (req, res) => {
   res.status(404).send({ err: "Endpoint not found" });
@@ -116,6 +121,14 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.message === "Article not found") {
     res.status(404).send({ err: "Not found" });
+  } else {
+    next(err);
+  }
+});
+app.use((err, req, res, next) => {
+  const message = "Comment ID not found";
+  if (err.message === message) {
+    res.status(404).send({ err: message });
   } else {
     next(err);
   }
