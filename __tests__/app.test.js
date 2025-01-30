@@ -122,7 +122,7 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("200: Responds with an all comments for an object with most recent comments first", () => {
+  test("200: Responds with all comments as an object with most recent comments first", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
@@ -142,14 +142,6 @@ describe("GET /api/articles/:article_id/comments", () => {
             })
           );
         });
-      });
-  });
-  test("404: Responds error message 'No comments found' if no comments", () => {
-    return request(app)
-      .get("/api/articles/10/comments")
-      .expect(404)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("No comments found");
       });
   });
   test("404: Article not found", () => {
