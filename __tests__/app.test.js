@@ -322,7 +322,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describegit("DELETE /api/comments/:comment_id", () => {
+describe("DELETE /api/comments/:comment_id", () => {
   test("204: Deletes a comment object by comment ID ", () => {
     return request(app)
       .delete("/api/comments/1")
