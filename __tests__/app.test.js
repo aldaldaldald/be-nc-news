@@ -234,6 +234,14 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(err).toBe("User does not exist");
       });
   });
+  test("400: Invalid article ID", () => {
+    return request(app)
+      .get("/api/articles/invalidarticleid")
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Bad Request");
+      });
+  });
   test("404: Article not found", () => {
     return request(app)
       .get("/api/articles/9000/comments")
