@@ -3,6 +3,7 @@ const {
   fetchArticleById,
   fetchCommentsByArticleId,
   addCommentByArticleId,
+  incrementVotesByArticleId,
 } = require("../models/articles.models");
 
 const getArticles = (req, res, next) => {
@@ -42,8 +43,19 @@ const postCommentByArticleId = (req, res, next) => {
   const articleId = req.params;
   addCommentByArticleId(newComment, articleId)
     .then((newComment) => {
-      console.log(newComment);
       res.status(201).send({ comment: newComment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+const patchVotesByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  incrementVotesByArticleId(article_id, inc_votes)
+    .then((updatedArticle) => {
+      res.status(200).send(updatedArticle);
     })
     .catch((err) => {
       next(err);
@@ -55,4 +67,5 @@ module.exports = {
   getArticleById,
   getCommentsByArticleId,
   postCommentByArticleId,
+  patchVotesByArticleId,
 };

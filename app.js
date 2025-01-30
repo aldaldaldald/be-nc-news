@@ -8,6 +8,7 @@ const {
   getArticleById,
   getCommentsByArticleId,
   postCommentByArticleId,
+  patchVotesByArticleId,
 } = require("./controllers/articles.controllers.js");
 
 // middleware
@@ -27,6 +28,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
+
+app.patch("/api/articles/:article_id", patchVotesByArticleId);
 
 app.all("*", (req, res) => {
   res.status(404).send({ err: "Endpoint not found" });
@@ -50,24 +53,53 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.message === "Body is missing") {
-    res.status(400).send({ err: "Body is missing" });
+  const message = "Body is missing";
+  if (err.message === message) {
+    res.status(400).send({ err: message });
   } else {
     next(err);
   }
 });
 
 app.use((err, req, res, next) => {
-  if (err.message === "Username is missing") {
-    res.status(400).send({ err: "Username is missing" });
+  const message = "Username is missing";
+  if (err.message === message) {
+    res.status(400).send({ err: message });
   } else {
     next(err);
   }
 });
 
 app.use((err, req, res, next) => {
-  if (err.message === "Body is empty") {
-    res.status(400).send({ err: "Body is empty" });
+  const message = "Body is empty";
+  if (err.message === message) {
+    res.status(400).send({ err: message });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === "23502") {
+    res.status(400).send({ err: "inc_votes required" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  const message = "inc_votes is not a number";
+  if (err.message === message) {
+    res.status(400).send({ err: message });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  const message = "inc_votes cannot be zero";
+  if (err.message === message) {
+    res.status(400).send({ err: message });
   } else {
     next(err);
   }

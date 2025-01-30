@@ -243,3 +243,81 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Patches an article object and increments the vote by 10", () => {
+    const newVote = 10;
+    const vote = { inc_votes: newVote };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(vote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("votes");
+        expect(body.votes).toBe(110);
+      });
+  });
+  test("200: Patches an article object and decrements the vote by 10", () => {
+    const newVote = -10;
+    const vote = { inc_votes: newVote };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(vote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("votes");
+        expect(body.votes).toBe(90);
+      });
+  });
+  test("400: Responds error message 'inc_votes required' if no vote", () => {
+    const newVote = null;
+    const vote = { inc_votes: newVote };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(vote)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("inc_votes required");
+      });
+  });
+  test("400: Responds error message 'inc_votes is not a number' if vote is not an number", () => {
+    const newVote = typeof NaN !== "number";
+    const vote = { inc_votes: newVote };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(vote)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("inc_votes is not a number");
+      });
+  });
+  test("400: Responds error message 'inc_votes cannot be zero' if vote is not an number", () => {
+    const newVote = 0;
+    const vote = { inc_votes: newVote };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(vote)
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("inc_votes cannot be zero");
+      });
+  });
+  test("400: Invalid article ID", () => {
+    return request(app)
+      .get("/api/articles/invalidarticleid")
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Bad Request");
+      });
+  });
+  test("404: Article not found", () => {
+    return request(app)
+      .get("/api/articles/9000")
+      .expect(404)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Not found");
+      });
+  });
+});

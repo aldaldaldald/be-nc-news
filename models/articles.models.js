@@ -77,9 +77,32 @@ const addCommentByArticleId = (newComment, articleId) => {
     });
 };
 
+const incrementVotesByArticleId = (article_id, inc_votes) => {
+  if (inc_votes === (typeof NaN !== "number")) {
+    return Promise.reject({ message: "inc_votes is not a number" });
+  }
+  if (inc_votes === 0) {
+    return Promise.reject({ message: "inc_votes cannot be zero" });
+  }
+  return db
+    .query(
+      `
+    UPDATE articles
+    SET votes = votes + $1
+    WHERE article_id = $2
+    RETURNING *;
+   `,
+      [inc_votes, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
 module.exports = {
   fetchArticles,
   fetchArticleById,
   fetchCommentsByArticleId,
   addCommentByArticleId,
+  incrementVotesByArticleId,
 };
