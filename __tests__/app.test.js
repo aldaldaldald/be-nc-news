@@ -76,7 +76,7 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200: Responds with an array of article objects", () => {
+  test("200: Responds with an array of article objects sorted by created_at date descending as default", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -99,6 +99,164 @@ describe("GET /api/articles", () => {
             })
           );
         });
+      });
+  });
+  test("200: Responds with an array of article objects sorted by author descending as default", () => {
+    const queries = ["author"];
+    return request(app)
+      .get("/api/articles?&sort_by=author")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy(queries, {
+          descending: true,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("200: Responds with an array of article objects sorted by topic descending as default", () => {
+    const queries = ["topic"];
+    return request(app)
+      .get("/api/articles?&sort_by=topic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy(queries, {
+          descending: true,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("200: Responds with an array of article objects sorted by author ascending", () => {
+    const queries = ["author"];
+    return request(app)
+      .get("/api/articles?&sort_by=author&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy(queries, {
+          descending: false,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("200: Responds with an array of article objects sorted by topic ascending", () => {
+    const queries = ["topic"];
+    return request(app)
+      .get("/api/articles?&sort_by=topic&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy(queries, {
+          descending: false,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("200: Responds with an array of article objects sorted by author descending", () => {
+    const queries = ["author"];
+    return request(app)
+      .get("/api/articles?&sort_by=author&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy(queries, {
+          descending: true,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("200: Responds with an array of article objects sorted by topic descending", () => {
+    const queries = ["topic"];
+    return request(app)
+      .get("/api/articles?&sort_by=topic&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy(queries, {
+          descending: true,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("400: Invalid column ID", () => {
+    return request(app)
+      .get("/api/articles?&sort_by=invalidcolumn")
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(err).toBe("Bad Request");
       });
   });
 });
