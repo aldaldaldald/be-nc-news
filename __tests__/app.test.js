@@ -251,6 +251,49 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  test("200: Responds with an array of article objects filtered by topic", () => {
+    const topics = [
+      ...new Set(testData.articleData.map((object) => object.topic)),
+    ];
+    const queries = "cats";
+    return request(app)
+      .get("/api/articles?&filter_by=cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(topics).toContain(queries);
+        expect(articles.length).toBe(1);
+        expect(articles).toBeSortedBy(queries, {
+          descending: true,
+        });
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "cats",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("400: Invalid filter request", () => {
+    const topics = [
+      ...new Set(testData.articleData.map((object) => object.topic)),
+    ];
+    const queries = "invalidfilter";
+    return request(app)
+      .get("/api/articles?&filter_by=invalidfilter")
+      .expect(400)
+      .then(({ body: { err } }) => {
+        expect(topics).not.toContain(queries);
+        expect(err).toBe("Bad Request");
+      });
+  });
   test("400: Invalid column ID", () => {
     return request(app)
       .get("/api/articles?&sort_by=invalidcolumn")
