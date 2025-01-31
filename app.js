@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const endpointsJson = require("./endpoints.JSON");
+const endpointsJson = require("./endpoints.json");
 
 const { getTopics } = require("./controllers/topics.controllers.js");
 const { getUsers } = require("./controllers/users.controllers.js");
