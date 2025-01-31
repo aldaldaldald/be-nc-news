@@ -4,14 +4,22 @@ const { convertTimestampToDate } = require("../db/seeds/utils");
 const fetchArticles = (queries) => {
   const sort_by = queries.sort_by;
   const order = queries.order;
+  const filter_by = queries.filter_by;
 
   let SQLString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes,  articles.article_img_url, 
          COUNT(comments.article_id)::int AS comment_count 
          FROM articles
          FULL JOIN comments
          ON articles.article_id = comments.article_id
-         GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url
          `;
+  const args = [];
+
+  if (filter_by) {
+    SQLString += " WHERE articles.topic = $1";
+    args.push(filter_by);
+  }
+
+  SQLString += ` GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url`;
 
   if (sort_by) {
     const validColumnNamesToSortBy = ["author", "topic"];
@@ -32,8 +40,12 @@ const fetchArticles = (queries) => {
     }
   }
 
-  return db.query(SQLString).then(({ rows }) => {
-    return rows;
+  return db.query(SQLString, args).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ message: "Bad Request" });
+    } else {
+      return rows;
+    }
   });
 };
 

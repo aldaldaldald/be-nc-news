@@ -23,7 +23,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles, sorted by date ascending with a comment count that is total count of all the comments with this article_id. array can be sorted by author or topic in ascending or descending order, with descending be default",
+    "description": "serves an array of all articles, sorted by date ascending with a comment count that is total count of all the comments with this article_id. array can be sorted by author or topic in ascending or descending order, with descending be default. array can be filtered by topic, descending as default",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
