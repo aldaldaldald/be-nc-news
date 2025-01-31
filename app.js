@@ -46,7 +46,7 @@ app.all("*", (req, res) => {
 // error-handling middleware
 // 400's
 app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
+  if (err.code === "22P02" || err.message === "Invalid column name") {
     res.status(400).send({ err: "Bad Request" });
   } else {
     next(err);

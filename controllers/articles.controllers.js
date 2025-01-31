@@ -7,7 +7,8 @@ const {
 } = require("../models/articles.models");
 
 const getArticles = (req, res, next) => {
-  fetchArticles()
+  const queries = req.query;
+  fetchArticles(queries)
     .then((articles) => {
       res.status(200).send({ articles });
     })

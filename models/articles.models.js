@@ -1,20 +1,40 @@
 const db = require("../db/connection");
 const { convertTimestampToDate } = require("../db/seeds/utils");
 
-const fetchArticles = () => {
-  return db
-    .query(
-      `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count
+const fetchArticles = (queries) => {
+  const sort_by = queries.sort_by;
+  const order = queries.order;
+
+  let SQLString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes,  articles.article_img_url, 
+         COUNT(comments.article_id)::int AS comment_count 
          FROM articles
          FULL JOIN comments
          ON articles.article_id = comments.article_id
          GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url
-         ORDER BY articles.created_at DESC
-      `
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+         `;
+
+  if (sort_by) {
+    const validColumnNamesToSortBy = ["author", "topic"];
+    if (validColumnNamesToSortBy.includes(sort_by)) {
+      SQLString += ` ORDER BY articles.${sort_by}`;
+    } else {
+      return Promise.reject({ message: "Invalid column name" });
+    }
+    if (order === "desc" || order === "asc") {
+      SQLString += " " + order;
+    }
+    if (!order) {
+      SQLString += " desc";
+    }
+  } else {
+    {
+      SQLString += ` ORDER BY articles.created_at DESC`;
+    }
+  }
+
+  return db.query(SQLString).then(({ rows }) => {
+    return rows;
+  });
 };
 
 const fetchArticleById = (article_id) => {
