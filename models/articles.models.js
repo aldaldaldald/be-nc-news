@@ -69,7 +69,6 @@ const fetchArticleById = (article_id) => {
       [article_id]
     )
     .then(({ rows }) => {
-      console.log(rows);
       if (rows.length === 0) {
         return Promise.reject({ message: "Article not found" });
       } else {
