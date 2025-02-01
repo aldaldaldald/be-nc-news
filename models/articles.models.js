@@ -28,12 +28,11 @@ const fetchArticles = (queries) => {
     } else {
       return Promise.reject({ message: "Invalid column name" });
     }
-    if (order === "desc" || order === "asc") {
-      SQLString += " " + order;
+    let defaultOrder = "desc";
+    if (order === "asc") {
+      defaultOrder = "asc";
     }
-    if (!order) {
-      SQLString += " desc";
-    }
+    SQLString += ` ${defaultOrder}`;
   } else {
     {
       SQLString += ` ORDER BY articles.created_at DESC`;
