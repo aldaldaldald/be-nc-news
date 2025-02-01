@@ -40,7 +40,7 @@
       ]
     }
   },
-  "GET /api/articles:article_id": {
+  "GET /api/articles/:article_id": {
     "description": "serves an article object including comment count",
     "queries": [],
     "exampleResponse": {
@@ -58,7 +58,7 @@
       ]
     }
   },
-  "GET /api/articles:article_id/comments": {
+  "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments for the given article_id ",
     "queries": [],
     "exampleResponse": {
@@ -74,7 +74,7 @@
       ]
     }
   },
-  "POST /api/articles:article_id/comments": {
+  "POST /api/articles/:article_id/comments": {
     "description": "serves an array of comments for the given article_id",
     "queries": [],
     "exampleResponse": {
@@ -90,7 +90,7 @@
       ]
     }
   },
-  "PATCH /api/articles:article_id/": {
+  "PATCH /api/articles/:article_id/": {
     "description": "patches an article object and increments the vote by given number. if votes is not already on the object it will be created",
     "queries": [],
     "exampleResponse": {
