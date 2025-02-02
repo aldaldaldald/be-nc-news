@@ -26,7 +26,7 @@ const fetchArticles = (queries) => {
     if (validColumnNamesToSortBy.includes(sort_by)) {
       SQLString += ` ORDER BY articles.${sort_by}`;
     } else {
-      return Promise.reject({ message: "Invalid column name" });
+      return Promise.reject({ message: "Invalid column ID" });
     }
     let defaultOrder = "desc";
     if (order === "asc") {
@@ -41,7 +41,7 @@ const fetchArticles = (queries) => {
 
   return db.query(SQLString, args).then(({ rows }) => {
     if (rows.length === 0) {
-      return Promise.reject({ message: "Bad Request" });
+      return Promise.reject({ message: "Invalid filter" });
     } else {
       return rows;
     }
@@ -49,6 +49,10 @@ const fetchArticles = (queries) => {
 };
 
 const fetchArticleById = (article_id) => {
+  const numericId = Number(article_id);
+  if (Number.isNaN(numericId)) {
+    return Promise.reject({ message: "Invalid article ID" });
+  }
   return db
     .query(
       `SELECT 
@@ -109,18 +113,27 @@ const addCommentByArticleId = (newComment, articleId) => {
     return Promise.reject({ message: "Username is missing" });
   }
   return db
-    .query(
-      `INSERT INTO comments (body, votes, author, article_id, created_at) 
+    .query(`SELECT * FROM users WHERE username = $1`, [username])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ message: "User does not exist" });
+      }
+      return db.query(
+        `INSERT INTO comments (body, votes, author, article_id, created_at) 
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [body, votes, username, article_id, created_at]
-    )
+        [body, votes, username, article_id, created_at]
+      );
+    })
     .then(({ rows }) => {
       return rows[0];
     });
 };
 
 const incrementVotesByArticleId = (article_id, inc_votes) => {
+  if (inc_votes === null) {
+    return Promise.reject({ message: "inc_votes required" });
+  }
   if (inc_votes === (typeof NaN !== "number")) {
     return Promise.reject({ message: "inc_votes is not a number" });
   }

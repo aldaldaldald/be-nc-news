@@ -44,101 +44,43 @@ app.all("*", (req, res) => {
 });
 
 // error-handling middleware
-// 400's
+// 400
 app.use((err, req, res, next) => {
-  if (
-    err.code === "22P02" ||
-    err.message === "Invalid column name" ||
-    err.message === "Bad Request"
-  ) {
-    res.status(400).send({ err: "Bad Request" });
-  } else {
-    next(err);
+  const errMessages = [
+    "Invalid column name",
+    "Invalid column ID",
+    "Invalid article ID",
+    "Invalid filter",
+    "User does not exist",
+    "Body is missing",
+    "Username is missing",
+    "Body is empty",
+    "inc_votes is not a number",
+    "inc_votes cannot be zero",
+    "inc_votes required",
+    "Comment ID not a number",
+  ];
+  for (let msg of errMessages) {
+    if (msg === err.message) {
+      return res.status(400).send({ err: "Bad Request", message: err.message });
+    }
   }
-});
-app.use((err, req, res, next) => {
-  if (err.code === "23503") {
-    res.status(400).send({ err: "User does not exist" });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  const message = "Body is missing";
-  if (err.message === message) {
-    res.status(400).send({ err: message });
-  } else {
-    next(err);
-  }
+  next(err);
 });
 
+// 404
 app.use((err, req, res, next) => {
-  const message = "Username is missing";
-  if (err.message === message) {
-    res.status(400).send({ err: message });
-  } else {
-    next(err);
+  const errMessages = [
+    "No comments found",
+    "Article not found",
+    "Comment ID not found",
+  ];
+  for (let msg of errMessages) {
+    if (msg === err.message) {
+      return res.status(404).send({ err: "Not found", message: err.message });
+    }
   }
-});
-
-app.use((err, req, res, next) => {
-  const message = "Body is empty";
-  if (err.message === message) {
-    res.status(400).send({ err: message });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "23502") {
-    res.status(400).send({ err: "inc_votes required" });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  const message = "inc_votes is not a number";
-  if (err.message === message) {
-    res.status(400).send({ err: message });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  const message = "inc_votes cannot be zero";
-  if (err.message === message) {
-    res.status(400).send({ err: message });
-  } else {
-    next(err);
-  }
-});
-
-// 404's
-app.use((err, req, res, next) => {
-  if (err.message === "No comments found") {
-    res.status(404).send({ err: "No comments found" });
-  } else {
-    next(err);
-  }
-});
-app.use((err, req, res, next) => {
-  if (err.message === "Article not found") {
-    res.status(404).send({ err: "Not found" });
-  } else {
-    next(err);
-  }
-});
-app.use((err, req, res, next) => {
-  const message = "Comment ID not found";
-  if (err.message === message) {
-    res.status(404).send({ err: message });
-  } else {
-    next(err);
-  }
+  next(err);
 });
 
 // 500
