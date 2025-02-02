@@ -289,17 +289,19 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles?&filter_by=invalidfilter")
       .expect(400)
-      .then(({ body: { err } }) => {
+      .then(({ body: { err, message } }) => {
         expect(topics).not.toContain(queries);
         expect(err).toBe("Bad Request");
+        expect(message).toBe("Invalid filter");
       });
   });
   test("400: Invalid column ID", () => {
     return request(app)
       .get("/api/articles?&sort_by=invalidcolumn")
       .expect(400)
-      .then(({ body: { err } }) => {
+      .then(({ body: { err, message } }) => {
         expect(err).toBe("Bad Request");
+        expect(message).toBe("Invalid column ID");
       });
   });
 });
@@ -344,20 +346,21 @@ describe("GET /api/articles/:article_id", () => {
         );
       });
   });
+  test("400: ID not a number", () => {
+    return request(app)
+      .get("/api/articles/text")
+      .expect(400)
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("Invalid article ID");
+      });
+  });
   test("404: Article not found", () => {
     return request(app)
       .get("/api/articles/9000")
       .expect(404)
       .then(({ body: { err } }) => {
         expect(err).toBe("Not found");
-      });
-  });
-  test("400: ID not a number", () => {
-    return request(app)
-      .get("/api/articles/text")
-      .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("Bad Request");
       });
   });
 });
@@ -389,7 +392,7 @@ describe("GET /api/articles/:article_id/comments", () => {
     return request(app)
       .get("/api/articles/9000/comments")
       .expect(404)
-      .then(({ body: { err } }) => {
+      .then(({ body: { err, message } }) => {
         expect(err).toBe("Not found");
       });
   });
@@ -425,8 +428,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .send(newComment)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("Body is missing");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("Body is missing");
       });
   });
   test("400: Responds error message 'Username is missing' if no username", () => {
@@ -437,8 +441,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .send(newComment)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("Username is missing");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("Username is missing");
       });
   });
   test("400: Responds error message 'Body is empty' if no body content", () => {
@@ -450,8 +455,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .send(newComment)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("Body is empty");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("Body is empty");
       });
   });
   test("400: Responds with an error when the username does not exist", () => {
@@ -463,16 +469,18 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .send(newComment)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("User does not exist");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("User does not exist");
       });
   });
   test("400: Invalid article ID", () => {
     return request(app)
       .get("/api/articles/invalidarticleid")
       .expect(400)
-      .then(({ body: { err } }) => {
+      .then(({ body: { err, message } }) => {
         expect(err).toBe("Bad Request");
+        expect(message).toBe("Invalid article ID");
       });
   });
   test("404: Article not found", () => {
@@ -519,8 +527,9 @@ describe("PATCH /api/articles/:article_id", () => {
       .patch("/api/articles/1")
       .send(vote)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("inc_votes required");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("inc_votes required");
       });
   });
   test("400: Responds error message 'inc_votes is not a number' if vote is not an number", () => {
@@ -530,8 +539,9 @@ describe("PATCH /api/articles/:article_id", () => {
       .patch("/api/articles/1")
       .send(vote)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("inc_votes is not a number");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("inc_votes is not a number");
       });
   });
   test("400: Responds error message 'inc_votes cannot be zero' if vote is not an number", () => {
@@ -541,16 +551,18 @@ describe("PATCH /api/articles/:article_id", () => {
       .patch("/api/articles/1")
       .send(vote)
       .expect(400)
-      .then(({ body: { err } }) => {
-        expect(err).toBe("inc_votes cannot be zero");
+      .then(({ body: { err, message } }) => {
+        expect(err).toBe("Bad Request");
+        expect(message).toBe("inc_votes cannot be zero");
       });
   });
   test("400: Invalid article ID", () => {
     return request(app)
       .get("/api/articles/invalidarticleid")
       .expect(400)
-      .then(({ body: { err } }) => {
+      .then(({ body: { err, message } }) => {
         expect(err).toBe("Bad Request");
+        expect(message).toBe("Invalid article ID");
       });
   });
   test("404: Article not found", () => {
@@ -576,8 +588,9 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app)
       .delete("/api/comments/text")
       .expect(400)
-      .then(({ body: { err } }) => {
+      .then(({ body: { err, message } }) => {
         expect(err).toBe("Bad Request");
+        expect(message).toBe("Comment ID not a number");
       });
   });
   test("404: Comment ID not found", () => {
@@ -585,7 +598,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/9000/")
       .expect(404)
       .then(({ body: { err } }) => {
-        expect(err).toBe("Comment ID not found");
+        expect(err).toBe("Not found");
       });
   });
 });

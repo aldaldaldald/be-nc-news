@@ -1,6 +1,10 @@
 const db = require("../db/connection");
 
 const deleteComment = (comment_id) => {
+  const numericId = Number(comment_id);
+  if (Number.isNaN(numericId)) {
+    return Promise.reject({ message: "Comment ID not a number" });
+  }
   return db
     .query(
       `DELETE FROM comments
