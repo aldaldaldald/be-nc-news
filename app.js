@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const endpointsJson = require("./endpoints.json");
+const cors = require("cors");
 
 const { getTopics } = require("./controllers/topics.controllers.js");
 const { getUsers } = require("./controllers/users.controllers.js");
@@ -14,6 +15,8 @@ const {
 const {
   deleteCommentByCommentId,
 } = require("./controllers/comments.controllers.js");
+
+app.use(cors());
 
 // middleware
 
